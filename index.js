@@ -31,29 +31,33 @@ async function main() {
   const step = { projectName }; // Store the project name
   updateStepPreview(step);
 
-  // Step 2: Ask for Project Type
+  // Step 2: Ask for Project Type (Allow multi-select)
   const projectTypeSpinner = ora("Waiting for project type...").start();
   const { projectType } = await inquirer.prompt([
     {
-      type: "list",
+      type: "checkbox", // Multi-select for project type
       name: "projectType",
-      message: "What type of project are you creating?",
+      message:
+        "What type of project are you creating? (Select multiple if needed)",
       choices: ["Frontend", "Backend", "Full Stack"],
     },
   ]);
   projectTypeSpinner.stop();
 
-  step.projectType = projectType; // Store the project type
+  step.projectType = projectType; // Store the project type(s)
   updateStepPreview(step);
 
-  // Step 3: Ask for Framework Based on Type
+  // Step 3: Ask for Framework Based on Type (Allow multi-select)
   let frameworkChoices = [];
-  if (projectType === "Frontend") {
+  if (projectType.includes("Frontend")) {
     frameworkChoices = ["React", "Vue", "Svelte", "Next.js"];
-  } else if (projectType === "Backend") {
-    frameworkChoices = ["Express.js", "NestJS", "Fastify"];
-  } else {
+  }
+  if (projectType.includes("Backend")) {
+    frameworkChoices = [...frameworkChoices, "Express.js", "NestJS", "Fastify"];
+  }
+  if (projectType.includes("Full Stack")) {
     frameworkChoices = [
+      ...frameworkChoices,
       "Next.js (Full Stack)",
       "Nuxt.js (Full Stack)",
       "Remix",
@@ -63,52 +67,63 @@ async function main() {
   const frameworkSpinner = ora("Waiting for framework choices...").start();
   const { framework } = await inquirer.prompt([
     {
-      type: "list",
+      type: "checkbox", // Multi-select for frameworks
       name: "framework",
-      message: `Choose a ${projectType} framework:`,
+      message:
+        "Choose frameworks for your project (Select multiple if needed):",
       choices: frameworkChoices,
     },
   ]);
   frameworkSpinner.stop();
 
-  step.framework = framework; // Store the selected framework
+  step.framework = framework; // Store the selected frameworks
   updateStepPreview(step);
 
   // Debugging log
   console.log(`📌 Debug: Project Name -> ${projectName}`);
-  console.log(`📌 Debug: Project Type -> ${projectType}`);
-  console.log(`📌 Debug: Framework -> ${framework}`);
+  console.log(`📌 Debug: Project Type(s) -> ${projectType.join(", ")}`);
+  console.log(`📌 Debug: Framework(s) -> ${framework.join(", ")}`);
 
   // Step 4: Recommend Installation Command
-  let installCommand = "";
-
-  if (framework === "React") {
-    installCommand = `npx create-react-app ${projectName}`;
-  } else if (framework === "Vue") {
-    installCommand = `npm init vue@latest ${projectName}`;
-  } else if (framework === "Svelte") {
-    installCommand = `npx degit sveltejs/template ${projectName}`;
-  } else if (framework === "Next.js") {
-    installCommand = `npx create-next-app@latest ${projectName}`;
-  } else if (framework === "Express.js") {
-    installCommand = `mkdir ${projectName} && cd ${projectName} && npm init -y && npm install express`;
-  } else if (framework === "NestJS") {
-    installCommand = `npx @nestjs/cli new ${projectName}`;
-  } else if (framework === "Fastify") {
-    installCommand = `mkdir ${projectName} && cd ${projectName} && npm init fastify@latest`;
-  } else if (framework === "Next.js (Full Stack)") {
-    installCommand = `npx create-next-app@latest ${projectName}`;
-  } else if (framework === "Nuxt.js (Full Stack)") {
-    installCommand = `npx nuxi init ${projectName}`;
-  } else if (framework === "Remix") {
-    installCommand = `npx create-remix@latest ${projectName}`;
-  } else {
-    console.error("❌ Error: No framework selected.");
+  if (framework.length === 0) {
+    console.log("❌ Error: No frameworks selected.");
     process.exit(1);
   }
 
   console.log("\n✅ Recommended command to create your project:");
-  console.log(`\n> ${installCommand}\n`);
+
+  framework.forEach((fw) => {
+    let installCommand = "";
+
+    // Determine the installation command based on selected framework
+    if (fw === "React") {
+      installCommand = `npx create-react-app ${projectName}`;
+    } else if (fw === "Vue") {
+      installCommand = `npm init vue@latest ${projectName}`;
+    } else if (fw === "Svelte") {
+      installCommand = `npx degit sveltejs/template ${projectName}`;
+    } else if (fw === "Next.js") {
+      installCommand = `npx create-next-app@latest ${projectName}`;
+    } else if (fw === "Express.js") {
+      installCommand = `mkdir ${projectName} && cd ${projectName} && npm init -y && npm install express`;
+    } else if (fw === "NestJS") {
+      installCommand = `npx @nestjs/cli new ${projectName}`;
+    } else if (fw === "Fastify") {
+      installCommand = `mkdir ${projectName} && cd ${projectName} && npm init fastify@latest`;
+    } else if (fw === "Next.js (Full Stack)") {
+      installCommand = `npx create-next-app@latest ${projectName}`;
+    } else if (fw === "Nuxt.js (Full Stack)") {
+      installCommand = `npx nuxi init ${projectName}`;
+    } else if (fw === "Remix") {
+      installCommand = `npx create-remix@latest ${projectName}`;
+    } else {
+      console.error("❌ Error: Framework not recognized.");
+      process.exit(1);
+    }
+
+    // Output the installation command for each selected framework
+    console.log(`\n> ${installCommand}\n`);
+  });
 }
 
 // Run the CLI
