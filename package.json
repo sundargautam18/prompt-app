@@ -2,6 +2,7 @@
   "name": "create-aitc",
   "version": "1.0.1",
   "description": "A CLI tool to scaffold a new project",
+  "main": "index.js",
   "bin": {
     "wifi": "./index.js"
   },
