@@ -48,6 +48,11 @@ async function main() {
     },
   ]);
 
+  // Debugging log
+  console.log(`📌 Debug: Project Name -> ${projectName}`);
+  console.log(`📌 Debug: Project Type -> ${projectType}`);
+  console.log(`📌 Debug: Framework -> ${framework}`);
+
   // Step 4: Recommend Installation Command
   let installCommand = "";
 
@@ -71,10 +76,14 @@ async function main() {
     installCommand = `npx nuxi init ${projectName}`;
   } else if (framework === "Remix") {
     installCommand = `npx create-remix@latest ${projectName}`;
+  } else {
+    console.error("❌ Error: No framework selected.");
+    process.exit(1);
   }
-n
+
   console.log("\n✅ Recommended command to create your project:");
   console.log(`\n> ${installCommand}\n`);
 }
 
+// Run the CLI
 main().catch((err) => console.error("Error:", err));
