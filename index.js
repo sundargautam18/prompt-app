@@ -1,11 +1,24 @@
 #!/usr/bin/env node
 
 import inquirer from "inquirer";
+import ora from "ora";
+
+// Function to update the preview of steps with tick marks
+function updateStepPreview(step) {
+  const stepsPreview = [
+    `Project Name: ${step.projectName ? "✅" : "❌"} ${step.projectName || ""}`,
+    `Project Type: ${step.projectType ? "✅" : "❌"} ${step.projectType || ""}`,
+    `Framework: ${step.framework ? "✅" : "❌"} ${step.framework || ""}`,
+  ];
+
+  console.clear(); // Clear the console for a fresh preview
+  console.log("🚀 Welcome to Create MyApp!");
+  stepsPreview.forEach((line) => console.log(line));
+  console.log("\n");
+}
 
 async function main() {
-  console.log("🚀 Welcome to Create MyApp!");
-
-  // Step 1: Ask for Project Name
+  // Step 1: Ask for Project Name without loading spinner at first
   const { projectName } = await inquirer.prompt([
     {
       type: "input",
@@ -15,7 +28,11 @@ async function main() {
     },
   ]);
 
+  const step = { projectName }; // Store the project name
+  updateStepPreview(step);
+
   // Step 2: Ask for Project Type
+  const projectTypeSpinner = ora("Waiting for project type...").start();
   const { projectType } = await inquirer.prompt([
     {
       type: "list",
@@ -24,6 +41,10 @@ async function main() {
       choices: ["Frontend", "Backend", "Full Stack"],
     },
   ]);
+  projectTypeSpinner.stop();
+
+  step.projectType = projectType; // Store the project type
+  updateStepPreview(step);
 
   // Step 3: Ask for Framework Based on Type
   let frameworkChoices = [];
@@ -39,6 +60,7 @@ async function main() {
     ];
   }
 
+  const frameworkSpinner = ora("Waiting for framework choices...").start();
   const { framework } = await inquirer.prompt([
     {
       type: "list",
@@ -47,6 +69,10 @@ async function main() {
       choices: frameworkChoices,
     },
   ]);
+  frameworkSpinner.stop();
+
+  step.framework = framework; // Store the selected framework
+  updateStepPreview(step);
 
   // Debugging log
   console.log(`📌 Debug: Project Name -> ${projectName}`);
