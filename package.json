@@ -1,6 +1,6 @@
 {
   "name": "create-aitc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool to scaffold a new project",
   "bin": {
     "create-aitc": "index.js"
