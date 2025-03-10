@@ -3,7 +3,10 @@
   "version": "1.0.1",
   "description": "A CLI tool to scaffold a new project",
   "bin": {
-    "create-aitc": "index.js"
+    "wifi": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
   },
   "type": "module",
   "dependencies": {
